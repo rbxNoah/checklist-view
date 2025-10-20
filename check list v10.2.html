@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Materiais - Decoração</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 2.8rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        button {
+            padding: 14px 22px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-warning { background: #ffc107; color: black; }
+        .btn-info { background: #17a2b8; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-primary { background: #007bff; color: white; }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .stat-Fitilhod {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .materials-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .category {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 6px solid #007bff;
+        }
+
+        .category-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #dee2e6;
+        }
+
+        .item {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 10px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 70px;
+        }
+
+        .item.unchecked {
+            background: #ffcccc;
+        }
+
+        .item.checked {
+            background: #d4edda;
+            text-decoration: line-through;
+            color: #6c757d;
+        }
+
+        .item:hover {
+            transform: translateX(5px);
+        }
+
+        .item input {
+            margin-right: 20px;
+            transform: scale(2);
+        }
+
+        .item label {
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        .subcategory {
+            margin-left: 25px;
+            border-left: 3px dashed #6c757d;
+            padding-left: 20px;
+        }
+
+        .subcategory-title {
+            font-weight: bold;
+            margin: 20px 0 15px 0;
+            color: #495057;
+            font-size: 1.4rem;
+        }
+
+        .toggle-colors {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .colors-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .color-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #e9ecef;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            min-height: 60px;
+        }
+
+        .color-item input {
+            margin-right: 12px;
+            transform: scale(1.5);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .debug {
+            background: #ff6b6b;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 Lista de Materiais para Decoração</h1>
+        
+        <div class="controls">
+            <button id="markAll" class="btn-success">✅ MarFitilho Todos</button>
+            <button id="unmarkAll" class="btn-danger">❌ DesmarFitilho Todos</button>
+            <button id="showUnchecked" class="btn-warning">👀 Ver Marcados</button>
+            <button id="showAll" class="btn-info">📋 Ver Todos</button>
+            <button id="addItem" class="btn-primary">➕ Adicionar Item</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-Fitilhod">
+                <div class="stat-number" id="totalCount">0</div>
+                <div>Total</div>
+            </div>
+            <div class="stat-Fitilhod">
+                <div class="stat-number" id="checkedCount">0</div>
+                <div>Concluídos</div>
+            </div>
+            <div class="stat-Fitilhod">
+                <div class="stat-number" id="remainingCount">0</div>
+                <div>Faltantes</div>
+            </div>
+        </div>
+
+        <div class="materials-container" id="materialsContainer">
+            <!-- Itens serão Fitilhoregados aqui -->
+        </div>
+
+        <!-- Modal para adicionar item -->
+        <div id="addItemModal" class="modal">
+            <div class="modal-content">
+                <h2>Adicionar Novo Item</h2>
+                <form id="addItemForm">
+                    <div class="form-group">
+                        <label for="itemName">Nome do Item:</label>
+                        <input type="text" id="itemName" required>
+                    </div>
+                    <div class="form-buttons">
+                        <button type="submit" class="btn-success">Adicionar</button>
+                        <button type="button" id="cancelAdd" class="btn-danger">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="debug" id="debugInfo">
+            Debug information will appear here
+        </div>
+    </div>
+
+    <script>
+        // Dados dos materiais atualizados e organizados alfabeticamente
+        const materialsData = [
+            {
+                title: "🏹 Arcos",
+                items: [
+                    {
+                        name: "Tipos de arco",
+                        subitems: [
+                            { id: "arco-americano", name: "Americano" },
+                            { id: "arco-redondo", name: "Redondo" }
+                        ]
+                    },
+                    {
+                        name: "Capa dos arcos",
+                        subitems: [
+                            { id: "capa-arco-americano", name: "Americano" },
+                            { id: "capa-arco-redondo", name: "Redondo" }
+                        ]
+                    }
+                ]
+            },
+            {
+                title: "🛠️ Ferramentas e Equipamentos",
+                items: [
+                    { id: "avental", name: "Avental" },
+                    {id: "Capa do Tambor", name: "Capa do Tambor"},
+                    { id: "bolo-fake", name: "Bolo fake" },
+                    { id: "boleira", name: "Boleira" },
+                    { id: "capa-tambor", name: "Capa de tambor" },
+                    { id: "display", name: "Display" },
+                    { id: "escada", name: "Escada" },
+                    { id: "escadinha-lembrancinha", name: "Escadinha de lembrancinha" },
+                    { id: "escrita-baby", name: "Escrita baby" },
+                    { id: "estilete", name: "Estilete" },
+                    { id: "feutro", name: "Feutro" },
+                    { id: "Fitilho", name: "Fitilho" },
+
+                    { id: "grampos", name: "Grampos" },
+                    { id: "locas", name: "Loças" },
+                    { id: "maquininha", name: "Maquininha de encher balão" },
+                    { id: "mesas", name: "Mesas" },
+                    { id: "nome-aniversariante", name: "Nome do aniversariante" },
+                    { id: "spray", name: "Spray de balão" },
+                    { id: "tambor", name: "Tambor" },
+                    { id: "vaso-flor", name: "Vaso de flor" }
+                ]
+            },
+            {
+                title: "📎 Materiais de Fixação",
+                items: [
+                    { id: "barbante", name: "Barbante" },
+                    { id: "elastico", name: "Elástico" },
+                    { id: "fita-crepe", name: "Fita crepe" },
+                    { id: "fita-durex", name: "Fita durex" },
+                    { id: "fita-dupla-branca", name: "Fita dupla face branca" },
+                    { id: "fita-dupla-verde", name: "Fita dupla face verde" },
+                    { id: "fita-led", name: "Fita led" },
+                    { id: "led", name: "LED" },
+                    { id: "naylon", name: "Náilon" },
+                    { id: "pelucias", name: "Pelúcias" },
+                    { id: "tapete", name: "Tapete" }
+                ]
+            },
+            {
+                title: "🎈 Balões - Tipos e Cores",
+                items: [
+                    {
+                        name: "Tipos de Balões",
+                        subitems: [
+                            { id: "baloes-coloridos", name: "Balões coloridos" },
+                            { id: "big-ball", name: "Big Ball (Bolha)" },
+                            { id: "baloes-transp-grande", name: "Balões transparentes - Grande" },
+                            { id: "baloes-transp-pequeno", name: "Balões transparentes - Pequeno" }
+                        ]
+                    },
+                    {
+                        name: "Tamanhos",
+                        subitems: [
+                            { id: "baloes-9", name: "Número 9" },
+                            { id: "baloes-12", name: "Número 12" },
+                            { id: "baloes-16", name: "Número 16" },
+                            { id: "baloes-32", name: "Número 32" }
+                        ]
+                    },
+                    {
+                        name: "🎈 Cores principais",
+                        subitems: [
+                            { id: "cor-acinzentado", name: "Acinzentado" },
+                            { id: "cor-areia", name: "Areia" },
+                            { id: "cor-azul-celeste", name: "Azul Celeste" },
+                            { id: "cor-azul-cobalto", name: "Azul Cobalto" },
+                            { id: "cor-azul-royal", name: "Azul Royal" },
+                            { id: "cor-bandeira", name: "Bandeira" },
+                            { id: "cor-berilo", name: "Berilo" },
+                            { id: "cor-branco", name: "Branco" },
+                            { id: "cor-champanhe", name: "Champanhe" },
+                            { id: "cor-cinza", name: "Cinza" },
+                            { id: "cor-cristal", name: "Cristal" },
+                            { id: "cor-eucalipto", name: "Eucalipto" },
+                            { id: "cor-gold-fusion", name: "Gold Fusion" },
+                            { id: "cor-limao", name: "Limão" },
+                            { id: "cor-laranja", name: "Laranja" },
+                            { id: "cor-lilas-vintage", name: "Lilás Vintage" },
+                            { id: "cor-marrom", name: "Marrom" },
+                            { id: "cor-marsala", name: "Marsala" },
+                            { id: "cor-pink", name: "Pink" },
+                            { id: "cor-preto", name: "Preto" },
+                            { id: "cor-rosa", name: "Rosa" },
+                            { id: "cor-rosa-chic", name: "Rosa Chic" },
+                            { id: "cor-rose-quartz", name: "Rose Quartz" },
+                            { id: "cor-roxo", name: "Roxo" },
+                            { id: "cor-salmao", name: "Salmão" },
+                            { id: "cor-terracota", name: "Terracota" },
+                            { id: "cor-tiffany", name: "Tiffany" },
+                            { id: "cor-verde-musgo", name: "Verde Musgo" },
+                            { id: "cor-vermelho", name: "Vermelho" },
+                            { id: "cor-amarelo", name: "Amarelo" },
+                            { id: "cor-lilas", name: "Lilás" }
+                        ]
+                    },
+                    {
+                        name: "🍼 Linha Baby",
+                        subitems: [
+                            { id: "cor-azul-bb", name: "Azul bb" },
+                            { id: "cor-amarelo-bb", name: "Amarelo bb" },
+                            { id: "cor-lilas-bb", name: "Lilás bb" },
+                            { id: "cor-rosa-bb", name: "Rosa bb" },
+                            { id: "cor-verde-bb", name: "Verde bb" }
+                        ]
+                    },
+                    {
+                        name: "🌈 Cores lisas adicionais",
+                        subitems: [
+                            { id: "cor-azul-indico", name: "Azul Índico" },
+                            { id: "cor-azul-piscina", name: "Azul Piscina" },
+                            { id: "cor-laranja-toranja", name: "Laranja Toranja" },
+                            { id: "cor-lilas-orquidea", name: "Lilás Orquídea" },
+                            { id: "cor-magenta", name: "Magenta" },
+                            { id: "cor-mocacino", name: "Mocacino" },
+                            { id: "cor-nude", name: "Nude" },
+                            { id: "cor-verde-menta", name: "Verde Menta" },
+                            { id: "cor-vermelho-roma", name: "Vermelho Romã" }
+                        ]
+                    },
+                    {
+                        name: "✨ Linha Perolizada",
+                        subitems: [
+                            { id: "cor-branco-perolizado", name: "Branco" },
+                            { id: "cor-ouro-perolizado", name: "Ouro" },
+                            { id: "cor-rosa-malibu", name: "Rosa Malibu" },
+                            { id: "cor-prata-perolizada", name: "Prata" }
+                        ]
+                    },
+                    {
+                        name: "🍬 Linha Candy",
+                        subitems: [
+                            { id: "cor-amarelo-candy", name: "Amarelo Candy" },
+                            { id: "cor-azul-candy", name: "Azul Candy" },
+                            { id: "cor-laranja-candy", name: "Laranja Candy" },
+                            { id: "cor-lilas-candy", name: "Lilás Candy" },
+                            { id: "cor-rosa-candy", name: "Rosa Candy" },
+                            { id: "cor-verde-candy", name: "Verde Candy" }
+                        ]
+                    },
+                    {
+                        name: "💎 Linha Perolizado Geral",
+                        subitems: [
+                            { id: "cor-dourado-perolizado", name: "Dourado" },
+                            { id: "cor-prata-perolizado", name: "Prata" }
+                        ]
+                    }
+                ]
+            },
+            {
+                title: "📝 Outros",
+                items: []
+            }
+        ];
+
+        // Variável para controlar visibilidade das cores
+        let coresVisiveis = false;
+
+        // Função para renderizar os materiais
+        function renderMaterials() {
+            console.log('Iniciando renderização...');
+            const container = document.getElementById('materialsContainer');
+            
+            if (!container) {
+                console.error('Container não encontrado!');
+                document.getElementById('debugInfo').textContent = 'ERRO: Container não encontrado!';
+                return;
+            }
+
+            container.innerHTML = '';
+
+            materialsData.forEach((category, categoryIndex) => {
+                console.log(`Renderizando categoria: ${category.title}`);
+                
+                const categoryEl = document.createElement('div');
+                categoryEl.className = 'category';
+
+                const categoryTitle = document.createElement('div');
+                categoryTitle.className = 'category-title';
+                categoryTitle.textContent = category.title;
+                categoryEl.appendChild(categoryTitle);
+
+                // Adicionar botão de toggle para cores apenas na categoria de balões
+                if (category.title === "🎈 Balões - Tipos e Cores") {
+                    const toggleButton = document.createElement('button');
+                    toggleButton.className = 'toggle-colors';
+                    toggleButton.textContent = coresVisiveis ? '👁️ Ocultar Cores' : '👁️ Mostrar Cores';
+                    toggleButton.addEventListener('click', () => {
+                        coresVisiveis = !coresVisiveis;
+                        renderMaterials();
+                    });
+                    categoryEl.appendChild(toggleButton);
+                }
+
+                category.items.forEach(item => {
+                    if (item.subitems) {
+                        console.log(`Renderizando subcategoria: ${item.name}`);
+                        
+                        const subcategoryEl = document.createElement('div');
+                        subcategoryEl.className = 'subcategory';
+
+                        const subcategoryTitle = document.createElement('div');
+                        subcategoryTitle.className = 'subcategory-title';
+                        subcategoryTitle.textContent = item.name;
+                        subcategoryEl.appendChild(subcategoryTitle);
+
+                        // Se for a subcategoria de cores, controlar visibilidade
+                        if (item.name.includes("Cores") && !coresVisiveis) {
+                            // Não renderizar as cores se estiverem ocultas
+                        } else {
+                            item.subitems.forEach(subitem => {
+                                subcategoryEl.appendChild(createItemElement(subitem));
+                            });
+                        }
+
+                        categoryEl.appendChild(subcategoryEl);
+                    } else {
+                        console.log(`Renderizando item: ${item.name}`);
+                        categoryEl.appendChild(createItemElement(item));
+                    }
+                });
+
+                container.appendChild(categoryEl);
+            });
+
+            console.log('Renderização concluída!');
+            document.getElementById('debugInfo').textContent = 'Renderização concluída com sucesso!';
+            updateStats();
+            loadState();
+        }
+
+        // Função para criar elemento de item
+        function createItemElement(itemData) {
+            const itemEl = document.createElement('div');
+            itemEl.className = 'item unchecked';
+            itemEl.dataset.id = itemData.id;
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = itemData.id;
+
+            const label = document.createElement('label');
+            label.htmlFor = itemData.id;
+            label.textContent = itemData.name;
+
+            itemEl.appendChild(checkbox);
+            itemEl.appendChild(label);
+
+            // Event listeners
+            itemEl.addEventListener('click', (e) => {
+                if (e.target !== checkbox) {
+                    checkbox.checked = !checkbox.checked;
+                    updateItemState(itemEl, checkbox.checked);
+                }
+            });
+
+            checkbox.addEventListener('change', () => {
+                updateItemState(itemEl, checkbox.checked);
+            });
+
+            return itemEl;
+        }
+
+        // Função para atualizar estado do item
+        function updateItemState(itemEl, isChecked) {
+            if (isChecked) {
+                itemEl.classList.remove('unchecked');
+                itemEl.classList.add('checked');
+            } else {
+                itemEl.classList.remove('checked');
+                itemEl.classList.add('unchecked');
+            }
+            
+            saveState();
+            updateStats();
+        }
+
+        // Função para atualizar estatísticas
+        function updateStats() {
+            const totalItems = document.querySelectorAll('.item').length;
+            const checkedItems = document.querySelectorAll('.item.checked').length;
+            const remainingItems = totalItems - checkedItems;
+
+            document.getElementById('totalCount').textContent = totalItems;
+            document.getElementById('checkedCount').textContent = checkedItems;
+            document.getElementById('remainingCount').textContent = remainingItems;
+        }
+
+        // Função para salvar estado
+        function saveState() {
+            const state = {};
+            document.querySelectorAll('.item').forEach(item => {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                state[item.dataset.id] = checkbox.checked;
+            });
+            
+            localStorage.setItem('materialsState', JSON.stringify(state));
+        }
+
+        // Função para Fitilhoregar estado
+        function loadState() {
+            const savedState = localStorage.getItem('materialsState');
+            if (savedState) {
+                const state = JSON.parse(savedState);
+                
+                document.querySelectorAll('.item').forEach(item => {
+                    const checkbox = item.querySelector('input[type="checkbox"]');
+                    const itemId = item.dataset.id;
+                    
+                    if (state.hasOwnProperty(itemId)) {
+                        checkbox.checked = state[itemId];
+                        updateItemState(item, state[itemId]);
+                    }
+                });
+            }
+        }
+
+        // Função para adicionar novo item
+        function addNewItem(itemName) {
+            const outrosCategory = materialsData.find(cat => cat.title === "📝 Outros");
+            if (outrosCategory) {
+                const newItem = {
+                    id: 'custom-' + Date.now(),
+                    name: itemName
+                };
+                outrosCategory.items.push(newItem);
+                
+                // Ordenar alfabeticamente
+                outrosCategory.items.sort((a, b) => a.name.localeCompare(b.name));
+                
+                renderMaterials();
+                saveMaterialsData();
+            }
+        }
+
+        // Função para salvar dados dos materiais
+        function saveMaterialsData() {
+            localStorage.setItem('materialsData', JSON.stringify(materialsData));
+        }
+
+        // Função para Fitilhoregar dados dos materiais
+        function loadMaterialsData() {
+            const savedData = localStorage.getItem('materialsData');
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                materialsData.forEach((category, index) => {
+                    if (parsedData[index]) {
+                        category.items = parsedData[index].items;
+                    }
+                });
+            }
+        }
+
+        // Configurar event listeners quando a página Fitilhoregar
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM Fitilhoregado!');
+            
+            // Fitilhoregar dados salvos
+            loadMaterialsData();
+            
+            // Renderizar materiais
+            renderMaterials();
+
+            // Configurar botões
+            document.getElementById('markAll').addEventListener('click', () => {
+                document.querySelectorAll('.item').forEach(item => {
+                    const checkbox = item.querySelector('input[type="checkbox"]');
+                    checkbox.checked = true;
+                    updateItemState(item, true);
+                });
+            });
+
+            document.getElementById('unmarkAll').addEventListener('click', () => {
+                document.querySelectorAll('.item').forEach(item => {
+                    const checkbox = item.querySelector('input[type="checkbox"]');
+                    checkbox.checked = false;
+                    updateItemState(item, false);
+                });
+            });
+
+            document.getElementById('showUnchecked').addEventListener('click', () => {
+                document.querySelectorAll('.item').forEach(item => {
+                    const checkbox = item.querySelector('input[type="checkbox"]');
+                    if (!checkbox.checked) {
+                        item.style.display = 'none';
+                    } else {
+                        item.style.display = 'flex';
+                    }
+                });
+            });
+
+            document.getElementById('showAll').addEventListener('click', () => {
+                document.querySelectorAll('.item').forEach(item => {
+                    item.style.display = 'flex';
+                });
+            });
+
+            // Modal para adicionar item
+            const modal = document.getElementById('addItemModal');
+            const addBtn = document.getElementById('addItem');
+            const cancelBtn = document.getElementById('cancelAdd');
+            const form = document.getElementById('addItemForm');
+
+            addBtn.addEventListener('click', () => {
+                modal.style.display = 'block';
+            });
+
+            cancelBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const itemName = document.getElementById('itemName').value;
+                if (itemName.trim()) {
+                    addNewItem(itemName.trim());
+                    modal.style.display = 'none';
+                    form.reset();
+                }
+            });
+
+            window.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+
+            console.log('Event listeners configurados!');
+        });
+
+        // Forçar renderização se o DOM já estiver Fitilhoregado
+        if (document.readyState === 'loading') {
+            console.log('DOM ainda Fitilhoregando...');
+        } else {
+            console.log('DOM já Fitilhoregado, renderizando...');
+            renderMaterials();
+        }
+    </script>
+</body>
+</html>
